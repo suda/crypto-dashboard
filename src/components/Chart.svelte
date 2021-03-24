@@ -42,6 +42,7 @@
   };
 
   const calculateStats = (prices, volume) => {
+    lastPrice = prices[prices.length - 1].close;
     change = (lastPrice / prices[0].open) * 100 - 100;
     totalVolume = volume.reduce((previous, current) => {
       return previous + current.value;
@@ -51,12 +52,16 @@
   const getData = async (lastTimestamp) => {
     const options = {};
     if (lastTimestamp) {
-      options.timestamp = new Date(lastTimestamp * 1000);
+      // CC API doesn't allow specifying "from" timestamp so we have to eyeball
+      // limit for a similar functionality
+      options.limit = Math.ceil((Date.now() / 1000 - lastTimestamp) / 60) + 1;
     }
-    const data = await cc[`histo${timeframe}`](fsym, tsym, options);
+    let data = await cc[`histo${timeframe}`](fsym, tsym, options);
+    if (lastTimestamp) {
+      data = data.filter((d) => d.time > lastTimestamp);
+    }
     const prices = data.map(pricesMapFn);
     const volume = data.map(volumeMapFn);
-    lastPrice = prices[prices.length - 1].close;
     return { prices, volume };
   };
 
@@ -113,6 +118,7 @@
       pricesData.push(...prices);
       volumeData.push(...volume);
 
+      calculateStats(pricesData, volumeData);
       candlestickSerie.setData(pricesData);
       volumeSerie.setData(volumeData);
     }, updateInterval * 1000 * 60);
