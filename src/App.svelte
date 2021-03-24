@@ -3,7 +3,7 @@
 </script>
 
 <main class="bg-gray-200 grid grid-cols-2 grid-rows-2 gap-6 p-6">
-	<Chart class="m-6" />
+	<Chart />
 	<Chart fsym="BTC" />
 	<Chart fsym="LTC" />
 	<Chart fsym="XLM" />
