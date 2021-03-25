@@ -3,6 +3,7 @@
   import { createChart } from "lightweight-charts";
   import cc from "cryptocompare";
   import _ from "lodash";
+  import { Model } from '../Model'; 
 
   let chartElement,
     chart,
@@ -10,6 +11,7 @@
     volumeSerie,
     pricesData,
     volumeData,
+    model,
     interval;
   let change = 0;
   let lastPrice = 0;
@@ -32,37 +34,12 @@
     LINK: "0x72E3Ad2332Ae59FE09Bfe2fAce3a3F5E71ee9B7e",
   };
 
-  const pricesMapFn = (d) =>
-    _.pick(d, ["time", "open", "high", "low", "close"]);
-  const volumeMapFn = ({ volumeto, time }) => {
-    return {
-      value: volumeto,
-      time,
-    };
-  };
-
   const calculateStats = (prices, volume) => {
     lastPrice = prices[prices.length - 1].close;
     change = (lastPrice / prices[0].open) * 100 - 100;
     totalVolume = volume.reduce((previous, current) => {
       return previous + current.value;
     }, 0);
-  };
-
-  const getData = async (lastTimestamp) => {
-    const options = {};
-    if (lastTimestamp) {
-      // CC API doesn't allow specifying "from" timestamp so we have to eyeball
-      // limit for a similar functionality
-      options.limit = Math.ceil((Date.now() / 1000 - lastTimestamp) / 60) + 1;
-    }
-    let data = await cc[`histo${timeframe}`](fsym, tsym, options);
-    if (lastTimestamp) {
-      data = data.filter((d) => d.time > lastTimestamp);
-    }
-    const prices = data.map(pricesMapFn);
-    const volume = data.map(volumeMapFn);
-    return { prices, volume };
   };
 
   const initCandlestick = (chart, data) => {
@@ -94,7 +71,8 @@
   };
 
   onMount(async () => {
-    const data = await getData();
+    model = new Model({ fsym, tsym, timeframe });
+    const data = await model.getData();
     pricesData = data.prices;
     volumeData = data.volume;
     calculateStats(pricesData, volumeData);
@@ -114,7 +92,7 @@
 
     interval = setInterval(async () => {
       const lastTimestamp = pricesData[pricesData.length - 1].time;
-      const { prices, volume } = await getData(lastTimestamp);
+      const { prices, volume } = await model.getData(lastTimestamp);
       pricesData.push(...prices);
       volumeData.push(...volume);
 
