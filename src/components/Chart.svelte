@@ -1,9 +1,8 @@
 <script>
   import { onMount } from "svelte";
   import { createChart } from "lightweight-charts";
-  import cc from "cryptocompare";
   import _ from "lodash";
-  import { Model } from '../Model'; 
+  import { Model } from "../Model";
 
   let chartElement,
     chart,
@@ -16,6 +15,7 @@
   let change = 0;
   let lastPrice = 0;
   let totalVolume = 0;
+  let loadingFinished = false;
 
   export let fsym = "ETH";
   export let tsym = "EUR";
@@ -76,6 +76,7 @@
     pricesData = data.prices;
     volumeData = data.volume;
     calculateStats(pricesData, volumeData);
+    loadingFinished = true;
 
     chart = createChart(chartElement, {
       width: chartElement.width,
@@ -137,10 +138,16 @@
       <div class="text-gray-400 md:text-xs">24h volume</div>
     </div>
   </div>
-  <div id="chart" bind:this={chartElement} />
+  <div id="chart" bind:this={chartElement}>
+    {#if !loadingFinished}
+      <div
+        class="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-64 w-64"
+      />
+    {/if}
+  </div>
   {#if donationAddresses[fsym]}
     <div
-      class="bg-purple-400 leading-none text-white rounded-lg p-2 shadow text-xs w-full"
+      class="bg-blue-400 leading-none text-white rounded-lg p-2 shadow text-xs w-full"
     >
       Support this work by donating <strong>{fsym}</strong> to:
       <strong>{donationAddresses[fsym]}</strong>
@@ -154,8 +161,34 @@
     width: 100%;
     @apply shadow p-6 rounded-lg bg-white;
   }
+
   #chart {
     height: calc(100% - 4.5rem);
     width: 100%;
+    @apply flex items-center justify-center;
+  }
+
+  .loader {
+    border-top-color: rgba(96, 165, 250);
+    -webkit-animation: spinner 1.5s linear infinite;
+    animation: spinner 1.5s linear infinite;
+  }
+
+  @-webkit-keyframes spinner {
+    0% {
+      -webkit-transform: rotate(0deg);
+    }
+    100% {
+      -webkit-transform: rotate(360deg);
+    }
+  }
+
+  @keyframes spinner {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
   }
 </style>
