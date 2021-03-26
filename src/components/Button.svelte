@@ -7,7 +7,7 @@
     typeClasses = "bg-blue-600 text-white hover:bg-blue-700 hover:white";
   } else {
     typeClasses =
-      "bg-gray-100 text-gray-400 hover:bg-gray-200 hover:text-black";
+      "bg-gray-200 text-gray-500 hover:bg-gray-300 hover:text-black";
   }
 </script>
 

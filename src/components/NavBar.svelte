@@ -4,6 +4,7 @@
 
   export let lastUpdated = new Date();
   export let onAddChart = () => {};
+  export let onApiKey = () => {};
 
   const timeframes = [
     { label: '1m', value: 1 },
@@ -24,6 +25,7 @@
   </div>
   <div>
     <Select options={timeframes} />
+    <Button onClick={onApiKey}>API Key</Button>
     <Button type="primary" onClick={onAddChart}>+ Add a chart</Button>
   </div>
 </nav>

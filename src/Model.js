@@ -1,11 +1,15 @@
 import cc from "cryptocompare";
 import _ from "lodash";
+import { apiKey } from "./stores/apiKey";
 
 export class Model {
   constructor({ fsym, tsym, timeframe }) {
     this.fsym = fsym;
     this.tsym = tsym;
     this.timeframe = timeframe;
+    apiKey.subscribe((value) => {
+      cc.setApiKey(value);
+    });
   }
 
   async getData(lastTimestamp) {

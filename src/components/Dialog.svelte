@@ -16,7 +16,7 @@
 >
   <div
     class="bg-gradient-to-b from-blue-100 to-blue-400 absolute inset-0 z-20"
-    on:click={onCancel}
+    on:click={() => nonCancelable ? '' : onCancel}
   />
   <div class="bg-white rounded-lg z-30">
     <div class="w-96 border-t-8 border-blue-600 rounded-lg flex">
