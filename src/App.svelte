@@ -12,6 +12,7 @@
 	let lastUpdated = new Date();
 	let showAddDialog = false;
 	let showApiKeyDialog = false;
+	let chartElements = [];
 
 	const removeChart = ({ fsym, tsym }) => {
 		removeOne({ fsym, tsym });
@@ -22,11 +23,22 @@
 		showAddDialog = false;
 	};
 
+	const updateAll = () => {
+		for (const el of chartElements) {
+			if (el) {
+				el.update();
+			}
+		}
+	}
+
 	onMount(() => {
 		showApiKeyDialog = !$apiKey;
+		apiKey.subscribe(updateAll);
 	});
 
-	setInterval(() => (lastUpdated = new Date()), 1000 * 10);
+	setInterval(() => {
+		lastUpdated = new Date();
+	}, 1000 * 10);
 </script>
 
 <main class="bg-gray-200 p-6">
@@ -44,14 +56,15 @@
 		{lastUpdated}
 		onAddChart={() => (showAddDialog = true)}
 		onApiKey={() => (showApiKeyDialog = true)}
+		onUpdate={updateAll}
 	/>
 	<article class="grid grid-cols-2 grid-rows-2 gap-6">
 		{#if !$charts.length}
 			<DummyChart />
 		{/if}
 
-		{#each $charts as chart}
-			<Chart removeCallback={removeChart} fsym={chart.fsym} tsym={chart.tsym} />
+		{#each $charts as chart, index}
+			<Chart bind:this={chartElements[index]} removeCallback={removeChart} fsym={chart.fsym} tsym={chart.tsym} />
 		{/each}
 	</article>
 </main>

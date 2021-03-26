@@ -4,14 +4,9 @@
   import _ from "lodash";
   import { Model } from "../Model";
 
-  let chartElement,
-    chart,
-    candlestickSerie,
-    volumeSerie,
-    pricesData,
-    volumeData,
-    model,
-    interval;
+  let chartElement, chart, candlestickSerie, volumeSerie, model, interval;
+  let pricesData = [];
+  let volumeData = [];
   let change = 0;
   let lastPrice = 0;
   let totalVolume = 0;
@@ -43,7 +38,7 @@
     }, 0);
   };
 
-  const initCandlestick = (chart, data) => {
+  const initCandlestick = (chart) => {
     const serie = chart.addCandlestickSeries({
       upColor: "rgb(38,166,154)",
       downColor: "rgb(255,82,82)",
@@ -51,11 +46,10 @@
       wickDownColor: "rgb(255,82,82)",
       borderVisible: false,
     });
-    serie.setData(data);
     return serie;
   };
 
-  const initVolume = (chart, data) => {
+  const initVolume = (chart) => {
     const serie = chart.addHistogramSeries({
       color: "rgba(0, 0, 0, 0.1)",
       priceFormat: {
@@ -67,17 +61,26 @@
         bottom: 0,
       },
     });
-    serie.setData(data);
     return serie;
   };
 
+  export const update = async () => {
+    loadingFinished = false;
+    const lastTimestamp = pricesData.length
+      ? pricesData[pricesData.length - 1].time
+      : undefined;
+    const { prices, volume } = await model.getData(lastTimestamp);
+    pricesData.push(...prices);
+    volumeData.push(...volume);
+
+    calculateStats(pricesData, volumeData);
+    candlestickSerie.setData(pricesData);
+    volumeSerie.setData(volumeData);
+    loadingFinished = true;
+  }
+
   onMount(async () => {
     model = new Model({ fsym, tsym, timeframe });
-    const data = await model.getData();
-    pricesData = data.prices;
-    volumeData = data.volume;
-    calculateStats(pricesData, volumeData);
-    loadingFinished = true;
 
     chart = createChart(chartElement, {
       width: chartElement.width,
@@ -92,20 +95,23 @@
     candlestickSerie = initCandlestick(chart, pricesData);
     volumeSerie = initVolume(chart, volumeData);
 
-    interval = setInterval(async () => {
-      const lastTimestamp = pricesData[pricesData.length - 1].time;
-      const { prices, volume } = await model.getData(lastTimestamp);
-      pricesData.push(...prices);
-      volumeData.push(...volume);
+    try {
+      await update();      
+    } catch (error) {
+      console.error(error);
+    }
 
-      calculateStats(pricesData, volumeData);
-      candlestickSerie.setData(pricesData);
-      volumeSerie.setData(volumeData);
+    interval = setInterval(async () => {
+      try {
+        await update();
+      } catch (error) {
+        console.error(error);
+      }
     }, updateInterval * 1000 * 60);
   });
 </script>
 
-<div class="chart-container">
+<div class="chart-container relative">
   <div class="flex justify-between items-center h-12 pb-3">
     <div>
       <div class="text-xl md:text-sm text-gray-800 font-bold leading-tight">
@@ -141,9 +147,7 @@
   </div>
   <div id="chart" bind:this={chartElement}>
     {#if !loadingFinished}
-      <div
-        class="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-64 w-64"
-      />
+      <div class="loader" />
     {/if}
   </div>
   {#if donationAddresses[fsym]}
@@ -181,9 +185,12 @@
   }
 
   .loader {
+    @apply z-10 absolute ease-linear rounded-full border-8 border-t-8 border-gray-200 h-64 w-64;
     border-top-color: rgba(37, 99, 235);
     -webkit-animation: spinner 1.5s linear infinite;
     animation: spinner 1.5s linear infinite;
+    left: calc(50% - 8rem);
+    top: calc(50% - 8rem);
   }
 
   @-webkit-keyframes spinner {
