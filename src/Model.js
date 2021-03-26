@@ -17,7 +17,7 @@ export class Model {
     }
     let data = await cc[`histo${this.timeframe}`](this.fsym, this.tsym, options);
     data = data.filter((d) => d.volumeto !== 0);
-  
+
     if (lastTimestamp) {
       data = data.filter((d) => d.time > lastTimestamp);
     }
