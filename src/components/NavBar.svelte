@@ -1,5 +1,18 @@
 <script>
+  import Select from './Select.svelte';
+  import Button from './Button.svelte';
+
   export let lastUpdated = new Date();
+  export let onAddChart = () => {};
+
+  const timeframes = [
+    { label: '1m', value: 1 },
+    { label: '5m', value: 5 },
+    { label: '15m', value: 15 },
+    { label: '1h', value: 60 },
+    { label: '6h', value: 360 },
+    { label: '1d', value: 1440 }
+  ];
 </script>
 
 <nav>
@@ -10,33 +23,8 @@
     </h2>
   </div>
   <div>
-    <div class="relative inline-flex">
-      <svg
-        class="w-2 h-2 absolute top-0 right-0 m-4 pointer-events-none"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 412 232"
-        ><path
-          d="M206 171.144L42.678 7.822c-9.763-9.763-25.592-9.763-35.355 0-9.763 9.764-9.763 25.592 0 35.355l181 181c4.88 4.882 11.279 7.323 17.677 7.323s12.796-2.441 17.678-7.322l181-181c9.763-9.764 9.763-25.592 0-35.355-9.763-9.763-25.592-9.763-35.355 0L206 171.144z"
-          fill="#648299"
-          fill-rule="nonzero"
-        /></svg
-      >
-      <select
-        class="border border-gray-300 rounded-lg text-gray-600 h-10 pl-5 pr-10 bg-white hover:border-gray-400 focus:outline-none appearance-none"
-      >
-        <option value="1">1m</option>
-        <option value="5">5m</option>
-        <option value="15">15m</option>
-        <option value="60">1h</option>
-        <option value="360">6h</option>
-        <option value="1440">1d</option>
-      </select>
-    </div>
-    <button
-      class="border border-blue-300 rounded-lg text-white h-10 pl-5 pr-5 bg-blue-400 hover:border-blue-500 focus:outline-none appearance-none"
-    >
-      + Add a chart
-    </button>
+    <Select options={timeframes} />
+    <Button type="primary" onClick={onAddChart}>+ Add a chart</Button>
   </div>
 </nav>
 
