@@ -1,6 +1,7 @@
 <script>
   import Select from './Select.svelte';
   import Button from './Button.svelte';
+  import { timeframe } from "../stores/timeframe";
 
   export let lastUpdated = new Date();
   export let onAddChart = () => {};
@@ -25,7 +26,7 @@
     </h2>
   </div>
   <div>
-    <Select options={timeframes} />
+    <Select options={timeframes} value={$timeframe} onChange={(v) => timeframe.set(v)} />
     <Button onClick={onApiKey}>API Key</Button>
     <Button onClick={onUpdate}>Update now</Button>
     <Button type="primary" onClick={onAddChart}>+ Add a chart</Button>

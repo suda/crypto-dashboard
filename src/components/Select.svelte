@@ -3,6 +3,7 @@
 
   export let options = [];
   export let onChange = () => {};
+  export let value;
 
   let element;
 
@@ -26,6 +27,7 @@
     class="border border-gray-300 rounded-lg text-gray-600 h-10 pl-5 pr-10 bg-white hover:border-gray-400 focus:outline-none appearance-none"
     on:change={(event) => onChange(event.target.value)}
     bind:this={element}
+    bind:value={value}
   >
     {#each options as option}
       <option value={option.value}>{option.label}</option>

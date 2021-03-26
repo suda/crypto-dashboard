@@ -8,11 +8,13 @@
 
 	import { charts, removeOne, addOne } from "./stores/charts";
 	import { apiKey } from "./stores/apiKey";
+	import { timeframe } from "./stores/timeframe";
 
 	let lastUpdated = new Date();
 	let showAddDialog = false;
 	let showApiKeyDialog = false;
 	let chartElements = [];
+	let interval;
 
 	const removeChart = ({ fsym, tsym }) => {
 		removeOne({ fsym, tsym });
@@ -34,6 +36,10 @@
 	onMount(() => {
 		showApiKeyDialog = !$apiKey;
 		apiKey.subscribe(updateAll);
+		timeframe.subscribe((i) => {
+			clearInterval(interval);
+			interval = setInterval(updateAll, i * 1000 * 60);
+		});
 	});
 
 	setInterval(() => {

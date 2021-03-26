@@ -4,7 +4,7 @@
   import _ from "lodash";
   import { Model } from "../Model";
 
-  let chartElement, chart, candlestickSerie, volumeSerie, model, interval;
+  let chartElement, chart, candlestickSerie, volumeSerie, model;
   let pricesData = [];
   let volumeData = [];
   let change = 0;
@@ -15,7 +15,6 @@
   export let fsym = "BTC";
   export let tsym = "USD";
   export let timeframe = "Minute"; // Also possible Hour and Day
-  export let updateInterval = 1;
   export let removeCallback = () => {};
 
   const donationAddresses = {
@@ -65,18 +64,22 @@
   };
 
   export const update = async () => {
-    loadingFinished = false;
-    const lastTimestamp = pricesData.length
-      ? pricesData[pricesData.length - 1].time
-      : undefined;
-    const { prices, volume } = await model.getData(lastTimestamp);
-    pricesData.push(...prices);
-    volumeData.push(...volume);
-
-    calculateStats(pricesData, volumeData);
-    candlestickSerie.setData(pricesData);
-    volumeSerie.setData(volumeData);
-    loadingFinished = true;
+    try {
+      loadingFinished = false;
+      const lastTimestamp = pricesData.length
+        ? pricesData[pricesData.length - 1].time
+        : undefined;
+      const { prices, volume } = await model.getData(lastTimestamp);
+      pricesData.push(...prices);
+      volumeData.push(...volume);
+  
+      calculateStats(pricesData, volumeData);
+      candlestickSerie.setData(pricesData);
+      volumeSerie.setData(volumeData);
+      loadingFinished = true;
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   onMount(async () => {
@@ -95,19 +98,7 @@
     candlestickSerie = initCandlestick(chart, pricesData);
     volumeSerie = initVolume(chart, volumeData);
 
-    try {
-      await update();      
-    } catch (error) {
-      console.error(error);
-    }
-
-    interval = setInterval(async () => {
-      try {
-        await update();
-      } catch (error) {
-        console.error(error);
-      }
-    }, updateInterval * 1000 * 60);
+    await update();
   });
 </script>
 
