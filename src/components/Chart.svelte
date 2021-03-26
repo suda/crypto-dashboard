@@ -21,6 +21,7 @@
   export let tsym = "EUR";
   export let timeframe = "Minute"; // Also possible Hour and Day
   export let updateInterval = 1;
+  export let removeCallback = () => {};
 
   const donationAddresses = {
     BTC: "1K7Uc9MDzokCGEsUxrQQXn59VQ1Q9AWGvZ",
@@ -104,7 +105,7 @@
   });
 </script>
 
-<div id="chart-container">
+<div class="chart-container">
   <div class="flex justify-between items-center h-12 pb-3">
     <div>
       <div class="text-xl md:text-sm text-gray-800 font-bold leading-tight">
@@ -153,19 +154,30 @@
       <strong>{donationAddresses[fsym]}</strong>
     </div>
   {/if}
+  <div class="remove" on:click={removeCallback({ fsym, tsym })} />
 </div>
 
 <style>
-  #chart-container {
-    height: 100%;
-    width: 100%;
-    @apply shadow p-6 rounded-lg bg-white;
-  }
-
   #chart {
     height: calc(100% - 4.5rem);
     width: 100%;
     @apply flex items-center justify-center;
+  }
+
+  .chart-container {
+    height: 100%;
+    width: 100%;
+    @apply shadow p-6 rounded-lg bg-white relative;
+  }
+
+  .chart-container:hover .remove {
+    @apply block;
+  }
+
+  .remove {
+    @apply w-8 h-8 bg-red-500 text-white shadow rounded-full absolute -right-4 -top-4 cursor-pointer hidden;
+    content: "";
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="-8 -8 48 48" x="0px" y="0px"><g><path fill="white" d="M27.86,22.19,21.68,16l6.18-6.18a4,4,0,0,0-5.67-5.67L16,10.34,9.82,4.15A4,4,0,0,0,4.16,9.83L10.33,16,4.15,22.19a4,4,0,0,0,0,5.67,4,4,0,0,0,5.67,0L16,21.68l6.18,6.18a4,4,0,0,0,5.67,0A4,4,0,0,0,27.86,22.19Z"/></g></svg>');
   }
 
   .loader {
