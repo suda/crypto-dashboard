@@ -17,8 +17,8 @@
   let totalVolume = 0;
   let loadingFinished = false;
 
-  export let fsym = "ETH";
-  export let tsym = "EUR";
+  export let fsym = "BTC";
+  export let tsym = "USD";
   export let timeframe = "Minute"; // Also possible Hour and Day
   export let updateInterval = 1;
   export let removeCallback = () => {};
@@ -148,7 +148,7 @@
   </div>
   {#if donationAddresses[fsym]}
     <div
-      class="bg-blue-400 leading-none text-white rounded-lg p-2 shadow text-xs w-full"
+      class="bg-blue-600 leading-none text-white rounded-lg p-2 shadow text-xs w-full"
     >
       Support this work by donating <strong>{fsym}</strong> to:
       <strong>{donationAddresses[fsym]}</strong>
@@ -181,7 +181,7 @@
   }
 
   .loader {
-    border-top-color: rgba(96, 165, 250);
+    border-top-color: rgba(37, 99, 235);
     -webkit-animation: spinner 1.5s linear infinite;
     animation: spinner 1.5s linear infinite;
   }

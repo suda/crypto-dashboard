@@ -11,3 +11,7 @@ export const removeOne = ({ fsym, tsym }) => {
   lastValue = lastValue.filter((o) => !(o.fsym === fsym && o.tsym === tsym));
   charts.set(lastValue);
 };
+export const addOne = ({ fsym, tsym }) => {
+  lastValue.push({ fsym, tsym });
+  charts.set(lastValue);
+};
